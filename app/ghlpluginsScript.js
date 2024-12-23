@@ -866,13 +866,9 @@ function handleGhlNavbar() {
             }
           } else {
 
-            // icon = document.createElement("i");
-            // icon.className = element.icon.value;
-            // icon.style.setProperty("color", element.color, "important");
             icon = document.createElement("i");
             icon.className = element.icon.value;
-            // const classesToRemove = ["text-white", "other-conflicting-class"]; 
-            // classesToRemove.forEach((cls) => icon.classList.remove(cls));
+      
             icon.style.removeProperty("color"); 
             icon.style.setProperty("color", element.color, "important");
           }
@@ -922,38 +918,53 @@ function handleGhlNavbar() {
                 imgIcon.style.borderRadius = "50%"; // Ensure image icons are circular
                 imgIcon.sette("src", element.icon.value);
                 navItem.querySelector("i").replaceWith(imgIcon);
-              }else if (element.icon.type === "svg") {
-                icon = document.createElement("div");
-                icon.innerHTML = element.icon.value;
-              
-                const svgElement = icon.querySelector("svg");
+              }
+            }else {
+              // Check the type of icon: "image", "svg", or fallback to a default
+              if (element.icon.type === "image") {
+                let parent = navItem.querySelector("i").parentNode;
+                let imgIcon = document.createElement("img");
+                imgIcon.style.height = "14px";
+                imgIcon.style.width = "14px";
+                imgIcon.style.borderRadius = "50%";
+                imgIcon.setAttribute("src", element.icon.value); // Corrected typo: `sette` -> `setAttribute`
+                navItem.querySelector("i").replaceWith(imgIcon); // Replace existing icon with image
+              } 
+              else if (element.icon.type === "svg") {
+                let svgContainer = document.createElement("div");
+                svgContainer.innerHTML = element.icon.value; // Insert the SVG markup
+            
+                const svgElement = svgContainer.querySelector("svg");
                 if (svgElement) {
-                  svgElement.removeAttribute("fill"); 
-                  svgElement.style.setProperty("fill", element.color, "important"); 
-              
+                  svgElement.removeAttribute("fill");
+                  svgElement.style.setProperty("fill", element.color, "important");
+            
                   const paths = svgElement.querySelectorAll("path");
                   paths.forEach((path) => {
-                    path.removeAttribute("fill"); 
-                    path.style.setProperty("fill", element.color, "important"); 
+                    path.removeAttribute("fill");
+                    path.style.setProperty("fill", element.color, "important");
                   });
                 }
-              } else {
-                console.log(navItem.querySelector("i"),"Please select");
-                
-
+            
+                navItem.querySelector("i").replaceWith(svgContainer); // Replace existing icon with SVG
+              } 
+              else {
+                // Default to font-icon (assumes a class name is provided in `element.icon.value`)
                 let icon = document.createElement("i");
                 icon.className = element.icon.value;
-                icon.style.removeProperty("color"); 
                 icon.style.setProperty("color", element.color, "important");
-                navItem.appendChild(icon);  
-                navItem.querySelector("i").replaceWith(icon);
-
-                console.log(navItem,"items");
-
-
-               
+            
+                const existingIcon = navItem.querySelector("i");
+                if (existingIcon) {
+                  existingIcon.replaceWith(icon); // Replace existing icon with new icon
+                } else {
+                  navItem.appendChild(icon); // Append if no existing icon found
+                }
               }
             }
+            
+
+            
 
             if (element.title) {
               navItem.style.width = "auto";
